@@ -65,3 +65,9 @@ Leverage the Async.js library or mongo $lookup aggregation capability to join th
 - https://cloud.google.com/appengine/docs/flexible/nodejs/integrating-with-analytics
 - https://caolan.github.io/async/index.html
 - https://support.google.com/analytics/answer/2709829
+
+## Postman Link
+[<img src="https://run.pstmn.io/button.svg" alt="Run In Postman" style="width: 128px; height: 32px;">](https://app.getpostman.com/run-collection/30299514-04ae400a-ff0b-499b-9f8e-81eb8b87f65b?action=collection%2Ffork&source=rip_markdown&collection-url=entityId%3D30299514-04ae400a-ff0b-499b-9f8e-81eb8b87f65b%26entityType%3Dcollection%26workspaceId%3Df4b2b56c-823e-48ab-beff-435d22ab180d#?env%5Bcsci3916%20-%20ashley%5D=W3sia2V5IjoiYm9va190aXRsZSIsInZhbHVlIjoidHVyaW5nIiwiZW5hYmxlZCI6dHJ1ZSwidHlwZSI6ImRlZmF1bHQiLCJzZXNzaW9uVmFsdWUiOiJ0dXJpbmciLCJzZXNzaW9uSW5kZXgiOjB9LHsia2V5IjoiYm9va19pZCIsInZhbHVlIjoiIiwiZW5hYmxlZCI6dHJ1ZSwidHlwZSI6ImFueSIsInNlc3Npb25WYWx1ZSI6IiIsInNlc3Npb25JbmRleCI6MX0seyJrZXkiOiJpZCIsInZhbHVlIjoiIiwiZW5hYmxlZCI6dHJ1ZSwidHlwZSI6ImFueSIsInNlc3Npb25WYWx1ZSI6IiIsInNlc3Npb25JbmRleCI6Mn0seyJrZXkiOiJlY2hvX2JvZHkiLCJ2YWx1ZSI6ImhlbGxvIHdvcmxkISIsImVuYWJsZWQiOnRydWUsInR5cGUiOiJkZWZhdWx0Iiwic2Vzc2lvblZhbHVlIjoiaGVsbG8gd29ybGQhIiwic2Vzc2lvbkluZGV4IjozfSx7ImtleSI6IkpXVCIsInZhbHVlIjoiSldUIGV5SmhiR2NpT2lKSVV6STFOaUlzSW5SNWNDSTZJa3BYVkNKOS5leUpwWkNJNklqWTFaakl4TWpVek5tSm1PR1JqTURBME1ERmtNVEEwWWlJc0luVnpaWEp1WVcxbElqb2lZV2gyYnlJc0ltbGhkQ0k2TVRjeE1ETTNOekE1TTMwLlVRWTR4SkN4RGo1RGRCT2ZHTUJPaGVNZVFtMlE0VUd6a3F2ZFAweTNYT2siLCJlbmFibGVkIjp0cnVlLCJ0eXBlIjoiZGVmYXVsdCIsInNlc3Npb25WYWx1ZSI6IkpXVC4uLiIsInNlc3Npb25JbmRleCI6NH1d)
+
+## Notes:
+To use the query parameters for reviews=true, use get movies in postman instead of get reviews. The get reviews in postman only posts the reviews without the movie information or ustilizes of the query parameters. 

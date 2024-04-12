@@ -194,40 +194,21 @@ router.post('/reviews', authJwtController.isAuthenticated, function(req, res) {
 
     const { movieId, username, review, rating } = req.body;
 
-    // Check if the user has already reviewed the movie
-    Review.findOne({ movieId, username }, function(err, existingReview) {
+    var newReview = new Review({
+        movieId,
+        username,
+        review,
+        rating
+    });
+
+    newReview.save(function(err) {
         if (err) {
-            return res.status(500).json({ success: false, message: 'Failed to check for duplicate review.', error: err });
+            return res.status(500).json({ success: false, message: 'Failed to add the review.', error: err });
         }
-
-        if (existingReview) {
-            // Update the existing review
-            existingReview.review = review;
-            existingReview.rating = rating;
-            existingReview.save(function(err) {
-                if (err) {
-                    return res.status(500).json({ success: false, message: 'Failed to update the review.', error: err });
-                }
-                res.status(200).json({ success: true, message: 'Review updated successfully.' });
-            });
-        } else {
-            // Create a new review
-            var newReview = new Review({
-                movieId,
-                username,
-                review,
-                rating
-            });
-
-            newReview.save(function(err) {
-                if (err) {
-                    return res.status(500).json({ success: false, message: 'Failed to add the review.', error: err });
-                }
-                res.status(201).json({ success: true, message: 'Review added successfully.' });
-            });
-        }
+        res.status(201).json({ success: true, message: 'Review added successfully.' });
     });
 });
+
 
 
 router.get('/reviews/:movieId', function(req, res) {
