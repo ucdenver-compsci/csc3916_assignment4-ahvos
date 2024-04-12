@@ -120,15 +120,14 @@ router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
 });
 
 router.get('/movies/:id', function(req, res) {
-    // Check if reviews=true query parameter is provided
-    const includeReviews = req.query.reviews === 'true';
-    const movieIds = req.query.movieIds ? req.query.movieIds.split(',') : [];
+    const movieId = req.params.id;
+    const includeReviews = req.query.reviews === 'true'; // Check if reviews=true query parameter is provided
 
     if (includeReviews) {
         Movie.aggregate([
             {
                 $match: {
-                    _id: { $in: movieIds.map(id => mongoose.Types.ObjectId(id)) }
+                    _id: mongoose.Types.ObjectId(movieId)
                 }
             },
             {
@@ -148,19 +147,26 @@ router.get('/movies/:id', function(req, res) {
             }
         ]).exec(function(err, movies) {
             if (err) {
-                return res.status(500).json({ success: false, message: 'Failed to retrieve specific movies with sorted reviews.', error: err });
+                return res.status(500).json({ success: false, message: 'Failed to retrieve the movie with sorted reviews.', error: err });
             }
-            res.status(200).json({ success: true, movies: movies });
+            if (movies.length === 0) {
+                return res.status(404).json({ success: false, message: 'Movie not found.' });
+            }
+            res.status(200).json({ success: true, movie: movies[0] });
         });
     } else {
-        Movie.find({ _id: { $in: movieIds.map(id => mongoose.Types.ObjectId(id)) } }, function(err, movies) {
+        Movie.findById(movieId, function(err, movie) {
             if (err) {
-                return res.status(500).json({ success: false, message: 'Failed to retrieve specific movies.', error: err });
+                return res.status(500).json({ success: false, message: 'Failed to retrieve the movie.', error: err });
             }
-            res.status(200).json({ success: true, movies: movies });
+            if (!movie) {
+                return res.status(404).json({ success: false, message: 'Movie not found.' });
+            }
+            res.status(200).json({ success: true, movie: movie });
         });
     }
 });
+
 
 
 
