@@ -119,12 +119,18 @@ router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
     });
 });
 
-router.get('/movies/:id', function(req, res) {
+router.get('/movies', function(req, res) {
     // Check if reviews=true query parameter is provided
     const includeReviews = req.query.reviews === 'true';
+    const movieIds = req.query.movieIds ? req.query.movieIds.split(',') : [];
 
     if (includeReviews) {
         Movie.aggregate([
+            {
+                $match: {
+                    _id: { $in: movieIds.map(id => mongoose.Types.ObjectId(id)) }
+                }
+            },
             {
                 $lookup: {
                     from: 'reviews',
@@ -142,19 +148,20 @@ router.get('/movies/:id', function(req, res) {
             }
         ]).exec(function(err, movies) {
             if (err) {
-                return res.status(500).json({ success: false, message: 'Failed to retrieve movies with sorted reviews.', error: err });
+                return res.status(500).json({ success: false, message: 'Failed to retrieve specific movies with sorted reviews.', error: err });
             }
             res.status(200).json({ success: true, movies: movies });
         });
     } else {
-        Movie.find({}, function(err, movies) {
+        Movie.find({ _id: { $in: movieIds.map(id => mongoose.Types.ObjectId(id)) } }, function(err, movies) {
             if (err) {
-                return res.status(500).json({ success: false, message: 'Failed to retrieve movies.', error: err });
+                return res.status(500).json({ success: false, message: 'Failed to retrieve specific movies.', error: err });
             }
             res.status(200).json({ success: true, movies: movies });
         });
     }
 });
+
 
 
 
