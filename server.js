@@ -127,8 +127,15 @@ router.get('/movies', function(req, res) {
             {
                 $lookup: {
                     from: 'reviews',
-                    localField: '_id',
-                    foreignField: 'movieId',
+                    let: { movieId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ['$movieId', '$$movieId'] }
+                            }
+                        },
+                        { $sort: { createdAt: -1 } } // Sort reviews by createdAt field in descending order
+                    ],
                     as: 'reviews'
                 }
             }
