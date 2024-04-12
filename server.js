@@ -88,35 +88,47 @@ router.post('/signin', function (req, res) {
 });
 
 
-router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
-    // Check if all required fields are provided
-    if (!req.body.title || !req.body.releaseDate || !req.body.genre || !req.body.actors) {
-        return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
-    }
+router.get('/movies', function(req, res) {
+    // Check if reviews=true query parameter is provided
+    const includeReviews = req.query.reviews === 'true';
+    const movieIds = req.query.movieIds ? req.query.movieIds.split(',') : [];
 
-    Movie.findOne({ title: req.body.title }, function(err, existingMovie) {
-        if (err) {
-            return res.status(500).json({ success: false, message: 'Failed to check for duplicate movie.', error: err });
-        }
-
-        if (existingMovie) {
-            return res.status(409).json({ success: false, message: 'A movie with the same title already exists.' });
-        }
-
-        var newMovie = new Movie({
-            title: req.body.title,
-            releaseDate: req.body.releaseDate,
-            genre: req.body.genre,
-            actors: req.body.actors
-        });
-
-        newMovie.save(function(err) {
-            if (err) {
-                return res.status(500).json({ success: false, message: 'Failed to add the movie.', error: err });
+    if (includeReviews) {
+        Movie.aggregate([
+            {
+                $match: {
+                    _id: { $in: movieIds.map(id => mongoose.Types.ObjectId(id)) }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'reviews',
+                    let: { movieId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ['$movieId', '$$movieId'] }
+                            }
+                        },
+                        { $sort: { createdAt: -1 } } // Sort reviews by createdAt field in descending order
+                    ],
+                    as: 'reviews'
+                }
             }
-            res.status(201).json({ success: true, message: 'Movie added successfully.' });
+        ]).exec(function(err, movies) {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Failed to retrieve specific movies with sorted reviews.', error: err });
+            }
+            res.status(200).json({ success: true, movies: movies });
         });
-    });
+    } else {
+        Movie.find({ _id: { $in: movieIds.map(id => mongoose.Types.ObjectId(id)) } }, function(err, movies) {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Failed to retrieve specific movies.', error: err });
+            }
+            res.status(200).json({ success: true, movies: movies });
+        });
+    }
 });
 
 router.get('/movies/:movieId', function(req, res) {
