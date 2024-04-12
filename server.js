@@ -10,6 +10,7 @@ var passport = require('passport');
 var authController = require('./auth');
 var authJwtController = require('./auth_jwt');
 var jwt = require('jsonwebtoken');
+var mongoose = require('mongoose');
 var cors = require('cors');
 var User = require('./Users');
 var Movie = require('./Movies');
