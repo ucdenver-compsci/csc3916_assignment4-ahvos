@@ -140,16 +140,11 @@ router.get('/movies/:id', function(req, res) {
 
 
 router.get('/movies/:id', function(req, res) {
-    const movieId = req.params.id;
-    const includeReviews = req.query.reviews === 'true'; // Check if reviews=true query parameter is provided
+    // Check if reviews=true query parameter is provided
+    const includeReviews = req.query.reviews === 'true';
 
     if (includeReviews) {
         Movie.aggregate([
-            {
-                $match: {
-                    _id: mongoose.Types.ObjectId(movieId)
-                }
-            },
             {
                 $lookup: {
                     from: 'reviews',
@@ -167,19 +162,20 @@ router.get('/movies/:id', function(req, res) {
             }
         ]).exec(function(err, movies) {
             if (err) {
-                return res.status(500).json({ success: false, message: 'Failed to retrieve the movie with sorted reviews.', error: err });
+                return res.status(500).json({ success: false, message: 'Failed to retrieve movies with sorted reviews.', error: err });
             }
-            res.status(200).json({ success: true, movie: movies.length > 0 ? movies[0] : null });
+            res.status(200).json({ success: true, movies: movies });
         });
     } else {
-        Movie.findById(movieId, function(err, movie) {
+        Movie.find({}, function(err, movies) {
             if (err) {
-                return res.status(500).json({ success: false, message: 'Failed to retrieve the movie.', error: err });
+                return res.status(500).json({ success: false, message: 'Failed to retrieve movies.', error: err });
             }
-            res.status(200).json({ success: true, movie: movie });
+            res.status(200).json({ success: true, movies: movies });
         });
     }
 });
+
 
 
 
