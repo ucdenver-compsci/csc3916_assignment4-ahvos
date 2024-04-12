@@ -100,6 +100,14 @@ router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
         actors: req.body.actors
     });
 
+    newMovie.save(function(err){
+        if (err) {
+            if (err.code == 11000)
+                return res.json({ success: false, message: 'A movie like that alreadt exists'});
+            else
+                return res.json(err);
+        }
+
     newMovie.save(function(err) {
         if (err) {
             return res.status(500).json({ success: false, message: 'Failed to add the movie.', error: err });
@@ -146,8 +154,10 @@ router.post('/reviews', authJwtController.isAuthenticated, function(req, res) {
         if (err) {
             return res.status(500).json({ success: false, message: 'Failed to add the review.', error: err });
         }
-        res.status(201).json({ success: true, message: 'Review added successfully.' });
+        res.status(201).json({ success: true, message: 'Review created!' });
     });
+
+     
 });
 
 
