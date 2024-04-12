@@ -119,22 +119,30 @@ router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
     });
 });
 
-router.get('/movies/:id', function(req, res) {
+router.get('/movies', function(req, res) {
+    // Check if reviews=true query parameter is provided
     const includeReviews = req.query.reviews === 'true';
 
     if (includeReviews) {
         Movie.aggregate([
             {
                 $lookup: {
-                    from: 'reviews', // Assuming the reviews collection name is 'reviews'
-                    localField: '_id',
-                    foreignField: 'movieId',
+                    from: 'reviews',
+                    let: { movieId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ['$movieId', '$$movieId'] }
+                            }
+                        },
+                        { $sort: { createdAt: -1 } } // Sort reviews by createdAt field in descending order
+                    ],
                     as: 'reviews'
                 }
             }
         ]).exec(function(err, movies) {
             if (err) {
-                return res.status(500).json({ success: false, message: 'Failed to retrieve movies with reviews.', error: err });
+                return res.status(500).json({ success: false, message: 'Failed to retrieve movies with sorted reviews.', error: err });
             }
             res.status(200).json({ success: true, movies: movies });
         });
@@ -147,6 +155,7 @@ router.get('/movies/:id', function(req, res) {
         });
     }
 });
+
 
 
 
