@@ -217,6 +217,15 @@ router.post('/reviews', authJwtController.isAuthenticated, function(req, res) {
     });
 });
 
+router.get('/reviews/:movieId', function(req, res) {
+    Review.find({ movieId: req.params.movieId }, function(err, reviews) {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Failed to retrieve reviews.', error: err });
+        }
+        res.status(200).json({ success: true, reviews: reviews });
+    });
+});
+
 
 app.use('/', router);
 app.listen(process.env.PORT || 8080);
