@@ -192,30 +192,43 @@ router.post('/reviews', authJwtController.isAuthenticated, function(req, res) {
         return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
     }
 
-    Review.findOne({ movieId: req.body.movieId, username: req.body.username }, function(err, existingReview) {
+    const { movieId, username, review, rating } = req.body;
+
+    // Check if the user has already reviewed the movie
+    Review.findOne({ movieId, username }, function(err, existingReview) {
         if (err) {
             return res.status(500).json({ success: false, message: 'Failed to check for duplicate review.', error: err });
         }
 
         if (existingReview) {
-            return res.status(409).json({ success: false, message: 'You have already submitted a review for this movie.' });
+            // Update the existing review
+            existingReview.review = review;
+            existingReview.rating = rating;
+            existingReview.save(function(err) {
+                if (err) {
+                    return res.status(500).json({ success: false, message: 'Failed to update the review.', error: err });
+                }
+                res.status(200).json({ success: true, message: 'Review updated successfully.' });
+            });
+        } else {
+            // Create a new review
+            var newReview = new Review({
+                movieId,
+                username,
+                review,
+                rating
+            });
+
+            newReview.save(function(err) {
+                if (err) {
+                    return res.status(500).json({ success: false, message: 'Failed to add the review.', error: err });
+                }
+                res.status(201).json({ success: true, message: 'Review added successfully.' });
+            });
         }
-
-        var newReview = new Review({
-            movieId: req.body.movieId,
-            username: req.body.username,
-            review: req.body.review,
-            rating: req.body.rating
-        });
-
-        newReview.save(function(err) {
-            if (err) {
-                return res.status(500).json({ success: false, message: 'Failed to add the review.', error: err });
-            }
-            res.status(201).json({ success: true, message: 'Review added successfully.' });
-        });
     });
 });
+
 
 router.get('/reviews/:movieId', function(req, res) {
     Review.find({ movieId: req.params.movieId }, function(err, reviews) {
