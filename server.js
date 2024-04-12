@@ -88,6 +88,17 @@ router.post('/signin', function (req, res) {
 });
 
 
+router.put('/movies/:id', authJwtController.isAuthenticated, function(req, res) {
+    Movie.findByIdAndUpdate(req.params.id, req.body, { new: true }, function(err, movie) {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Failed to update the movie.', error: err });
+        }
+        if (!movie) {
+            return res.status(404).json({ success: false, message: 'Movie not found.' });
+        }
+        res.status(200).json({ success: true, message: 'Movie updated successfully.', movie: movie });
+    });
+});
 
 router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
     if (!req.body.title || !req.body.releaseDate || !req.body.genre || !req.body.actors) {
@@ -115,6 +126,18 @@ router.get('/movies', function(req, res) {
             return res.status(500).json({ success: false, message: 'Failed to retrieve movies.', error: err });
         }
         res.status(200).json({ success: true, movies: movies });
+    });
+});
+
+router.delete('/movies/:id', authJwtController.isAuthenticated, function(req, res) {
+    Movie.findByIdAndRemove(req.params.id, function(err, movie) {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Failed to delete the movie.', error: err });
+        }
+        if (!movie) {
+            return res.status(404).json({ success: false, message: 'Movie not found.' });
+        }
+        res.status(200).json({ success: true, message: 'Movie deleted successfully.' });
     });
 });
 
