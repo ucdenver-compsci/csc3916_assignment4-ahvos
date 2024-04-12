@@ -89,30 +89,33 @@ router.post('/signin', function (req, res) {
 
 
 router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
+    // Check if all required fields are provided
     if (!req.body.title || !req.body.releaseDate || !req.body.genre || !req.body.actors) {
         return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
     }
 
-    var newMovie = new Movie({
-        title: req.body.title,
-        releaseDate: req.body.releaseDate,
-        genre: req.body.genre,
-        actors: req.body.actors
-    });
-
-    newMovie.save(function(err){
+    Movie.findOne({ title: req.body.title }, function(err, existingMovie) {
         if (err) {
-            if (err.code == 11000)
-                return res.json({ success: false, message: 'A movie like that alreadt exists'});
-            else
-                return res.json(err);
+            return res.status(500).json({ success: false, message: 'Failed to check for duplicate movie.', error: err });
         }
 
-    newMovie.save(function(err) {
-        if (err) {
-            return res.status(500).json({ success: false, message: 'Failed to add the movie.', error: err });
+        if (existingMovie) {
+            return res.status(409).json({ success: false, message: 'A movie with the same title already exists.' });
         }
-        res.status(201).json({ success: true, message: 'Movie added successfully.' });
+
+        var newMovie = new Movie({
+            title: req.body.title,
+            releaseDate: req.body.releaseDate,
+            genre: req.body.genre,
+            actors: req.body.actors
+        });
+
+        newMovie.save(function(err) {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Failed to add the movie.', error: err });
+            }
+            res.status(201).json({ success: true, message: 'Movie added successfully.' });
+        });
     });
 });
 
@@ -138,26 +141,35 @@ router.delete('/movies/:id', authJwtController.isAuthenticated, function(req, re
 });
 
 
+
 router.post('/reviews', authJwtController.isAuthenticated, function(req, res) {
     if (!req.body.movieId || !req.body.username || !req.body.review || !req.body.rating) {
         return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
     }
 
-    var newReview = new Review({
-        movieId: req.body.movieId,
-        username: req.body.username,
-        review: req.body.review,
-        rating: req.body.rating
-    });
-
-    newReview.save(function(err) {
+    Review.findOne({ movieId: req.body.movieId, username: req.body.username }, function(err, existingReview) {
         if (err) {
-            return res.status(500).json({ success: false, message: 'Failed to add the review.', error: err });
+            return res.status(500).json({ success: false, message: 'Failed to check for duplicate review.', error: err });
         }
-        res.status(201).json({ success: true, message: 'Review created!' });
-    });
 
-     
+        if (existingReview) {
+            return res.status(409).json({ success: false, message: 'You have already submitted a review for this movie.' });
+        }
+
+        var newReview = new Review({
+            movieId: req.body.movieId,
+            username: req.body.username,
+            review: req.body.review,
+            rating: req.body.rating
+        });
+
+        newReview.save(function(err) {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Failed to add the review.', error: err });
+            }
+            res.status(201).json({ success: true, message: 'Review added successfully.' });
+        });
+    });
 });
 
 
