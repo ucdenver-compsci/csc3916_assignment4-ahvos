@@ -120,13 +120,34 @@ router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
 });
 
 router.get('/movies', function(req, res) {
-    Movie.find({}, function(err, movies) {
-        if (err) {
-            return res.status(500).json({ success: false, message: 'Failed to retrieve movies.', error: err });
-        }
-        res.status(200).json({ success: true, movies: movies });
-    });
+    const includeReviews = req.query.reviews === 'true';
+
+    if (includeReviews) {
+        Movie.aggregate([
+            {
+                $lookup: {
+                    from: 'reviews',
+                    localField: '_id',
+                    foreignField: 'movieId',
+                    as: 'reviews'
+                }
+            }
+        ]).exec(function(err, movies) {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Failed to retrieve movies with reviews.', error: err });
+            }
+            res.status(200).json({ success: true, movies: movies });
+        });
+    } else {
+        Movie.find({}, function(err, movies) {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Failed to retrieve movies.', error: err });
+            }
+            res.status(200).json({ success: true, movies: movies });
+        });
+    }
 });
+
 
 router.delete('/movies/:id', authJwtController.isAuthenticated, function(req, res) {
     Movie.findByIdAndRemove(req.params.id, function(err, movie) {
