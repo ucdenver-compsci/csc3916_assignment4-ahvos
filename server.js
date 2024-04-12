@@ -119,7 +119,7 @@ router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
     });
 });
 
-router.get('/movies', function(req, res) {
+router.get('/movies/:id', function(req, res) {
     // Check if reviews=true query parameter is provided
     const includeReviews = req.query.reviews === 'true';
     const movieIds = req.query.movieIds ? req.query.movieIds.split(',') : [];
