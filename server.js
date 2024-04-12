@@ -87,6 +87,37 @@ router.post('/signin', function (req, res) {
     })
 });
 
+
+
+router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
+    if (!req.body.title || !req.body.releaseDate || !req.body.genre || !req.body.actors) {
+        return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
+    }
+
+    var newMovie = new Movie({
+        title: req.body.title,
+        releaseDate: req.body.releaseDate,
+        genre: req.body.genre,
+        actors: req.body.actors
+    });
+
+    newMovie.save(function(err) {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Failed to add the movie.', error: err });
+        }
+        res.status(201).json({ success: true, message: 'Movie added successfully.' });
+    });
+});
+
+router.get('/movies', function(req, res) {
+    Movie.find({}, function(err, movies) {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Failed to retrieve movies.', error: err });
+        }
+        res.status(200).json({ success: true, movies: movies });
+    });
+});
+
 app.use('/', router);
 app.listen(process.env.PORT || 8080);
 module.exports = app; // for testing only
