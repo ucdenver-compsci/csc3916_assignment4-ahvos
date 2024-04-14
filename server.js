@@ -91,7 +91,7 @@ router.post('/signin', authJwtController.isAuthenticated, function (req, res) {
 
 router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
     // Check if all required fields are provided
-    if (!req.body.title || !req.body.releaseDate || !req.body.genre || !req.body.actors) {
+    if (!req.body.title || !req.body.releaseDate || !req.body.genre || !req.body.actors || !req.body.imageURL) {
         return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
     }
 
@@ -108,7 +108,8 @@ router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
             title: req.body.title,
             releaseDate: req.body.releaseDate,
             genre: req.body.genre,
-            actors: req.body.actors
+            actors: req.body.actors,
+            imageURL: req.body.imageURL
         });
 
         newMovie.save(function(err) {
