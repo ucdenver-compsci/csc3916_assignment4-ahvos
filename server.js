@@ -43,7 +43,7 @@ function getJSONObjectForMovieRequirement(req) {
     return json;
 }
 
-router.post('/signup', function(req, res) {
+router.post('/signup', authJwtController.isAuthenticated, function(req, res) {
     if (!req.body.username || !req.body.password) {
         res.json({success: false, msg: 'Please include both username and password to signup.'})
     } else {
@@ -65,7 +65,7 @@ router.post('/signup', function(req, res) {
     }
 });
 
-router.post('/signin', function (req, res) {
+router.post('/signin', authJwtController.isAuthenticated, function (req, res) {
     var userNew = new User();
     userNew.username = req.body.username;
     userNew.password = req.body.password;
@@ -120,7 +120,7 @@ router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
     });
 });
 
-router.get('/movies/:id', function(req, res) {
+router.get('/movies/:id', authJwtController.isAuthenticated, function(req, res) {
     const movieId = req.params.id;
     const includeReviews = req.query.reviews === 'true'; // Check if reviews=true query parameter is provided
 
@@ -211,7 +211,7 @@ router.post('/reviews', authJwtController.isAuthenticated, function(req, res) {
 
 
 
-router.get('/reviews/:movieId', function(req, res) {
+router.get('/reviews/:movieId', authJwtController.isAuthenticated, function(req, res) {
     Review.find({ movieId: req.params.movieId }, function(err, reviews) {
         if (err) {
             return res.status(500).json({ success: false, message: 'Failed to retrieve reviews.', error: err });
