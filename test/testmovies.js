@@ -98,6 +98,7 @@ describe('Test Movie Routes', () => {
                         movie.should.have.property('releaseDate')
                         movie.should.have.property('genre')
                         movie.should.have.property('actors')
+                        movie.should.have.property('imageURL')
                     });
                     done();
                 })
