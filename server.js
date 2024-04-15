@@ -89,7 +89,7 @@ router.post('/signin', function (req, res) {
 });
 
 
-router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
+router.post('/movies', function(req, res) {
     // Check if all required fields are provided
     if (!req.body.title || !req.body.releaseDate || !req.body.genre || !req.body.actors || !req.body.imageURL) {
         return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
@@ -121,7 +121,7 @@ router.post('/movies', authJwtController.isAuthenticated, function(req, res) {
     });
 });
 
-router.get('/movies/:id', authJwtController.isAuthenticated, function(req, res) {
+router.get('/movies/:id', function(req, res) {
     const movieId = req.params.id;
     const includeReviews = req.query.reviews === 'true'; // Check if reviews=true query parameter is provided
 
@@ -174,7 +174,7 @@ router.get('/movies/:id', authJwtController.isAuthenticated, function(req, res) 
 
 
 
-router.delete('/movies/:id', authJwtController.isAuthenticated, function(req, res) {
+router.delete('/movies/:id', function(req, res) {
     Movie.findByIdAndRemove(req.params.id, function(err, movie) {
         if (err) {
             return res.status(500).json({ success: false, message: 'Failed to delete the movie.', error: err });
@@ -188,7 +188,7 @@ router.delete('/movies/:id', authJwtController.isAuthenticated, function(req, re
 
 
 
-router.post('/reviews', authJwtController.isAuthenticated, function(req, res) {
+router.post('/reviews', function(req, res) {
     if (!req.body.movieId || !req.body.username || !req.body.review || !req.body.rating) {
         return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
     }
