@@ -130,7 +130,7 @@ router.get('/movies/:id', function(req, res) {
         Movie.aggregate([
             {
                 $match: {
-                    _id: movieId
+                    _id: mongoose.Types.ObjectId(movieId)
                 }
             },
             {
