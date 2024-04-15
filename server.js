@@ -121,6 +121,7 @@ router.post('/movies', function(req, res) {
     });
 });
 
+
 router.get('/movies/:id', function(req, res) {
     const movieId = req.params.id;
     const includeReviews = req.query.reviews === 'true'; // Check if reviews=true query parameter is provided
@@ -129,7 +130,7 @@ router.get('/movies/:id', function(req, res) {
         Movie.aggregate([
             {
                 $match: {
-                    _id: mongoose.Types.ObjectId(movieId)
+                    _id: movieId
                 }
             },
             {
