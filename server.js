@@ -171,6 +171,55 @@ router.get('/movies/:id', function(req, res) {
 });
 
 
+router.get('/movies', function(req, res) {
+    const movieId = req.params.id;
+    const includeReviews = req.query.reviews === 'true'; // Check if reviews=true query parameter is provided
+
+    if (includeReviews) {
+        Movie.aggregate([
+            {
+                $match: {
+                    _id: mongoose.Types.ObjectId(movieId)
+                }
+            },
+            {
+                $lookup: {
+                    from: 'reviews',
+                    let: { movieId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: { $eq: ['$movieId', '$$movieId'] }
+                            }
+                        },
+                        { $sort: { createdAt: -1 } } // Sort reviews by createdAt field in descending order
+                    ],
+                    as: 'reviews'
+                }
+            }
+        ]).exec(function(err, movies) {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Failed to retrieve the movie with sorted reviews.', error: err });
+            }
+            if (movies.length === 0) {
+                return res.status(404).json({ success: false, message: 'Movie not found.' });
+            }
+            res.status(200).json({ success: true, movie: movies[0] });
+        });
+    } else {
+        Movie.findById(movieId, function(err, movie) {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Failed to retrieve the movie.', error: err });
+            }
+            if (!movie) {
+                return res.status(404).json({ success: false, message: 'Movie not found.' });
+            }
+            res.status(200).json({ success: true, movie: movie });
+        });
+    }
+});
+
+
 
 
 
