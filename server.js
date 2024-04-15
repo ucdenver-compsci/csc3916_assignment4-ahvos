@@ -43,7 +43,7 @@ function getJSONObjectForMovieRequirement(req) {
     return json;
 }
 
-router.post('/signup', authJwtController.isAuthenticated, function(req, res) {
+router.post('/signup', function(req, res) {
     if (!req.body.username || !req.body.password) {
         res.json({success: false, msg: 'Please include both username and password to signup.'})
     } else {
@@ -65,7 +65,7 @@ router.post('/signup', authJwtController.isAuthenticated, function(req, res) {
     }
 });
 
-router.post('/signin', authJwtController.isAuthenticated, function (req, res) {
+router.post('/signin', function (req, res) {
     var userNew = new User();
     userNew.username = req.body.username;
     userNew.password = req.body.password;
