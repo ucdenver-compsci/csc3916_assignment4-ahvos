@@ -121,6 +121,16 @@ router.post('/movies', function(req, res) {
     });
 });
 
+router.get('/movies', function(req, res) {
+    Movie.find({}, function(err, movies) {
+        if (err) {
+            return res.status(500).json({ success: false, message: 'Failed to retrieve movies.', error: err });
+        }
+        res.status(200).json({ success: true, movies: movies });
+    });
+});
+
+
 router.get('/movies/:id', function(req, res) {
     const movieId = req.params.id;
     const includeReviews = req.query.reviews === 'true'; // Check if reviews=true query parameter is provided
