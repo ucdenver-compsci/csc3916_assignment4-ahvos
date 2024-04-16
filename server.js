@@ -124,7 +124,7 @@ router.post('/movies', function(req, res) {
 
 router.get('/movies/:id', function(req, res) {
     const movieId = req.params.id;
-    const includeReviews = req.query.reviews === 'true'; // Check if reviews=true query parameter is provided
+    const includeReviews = req.query.reviews === 'true';
 
     if (includeReviews) {
         Movie.aggregate([
@@ -143,7 +143,7 @@ router.get('/movies/:id', function(req, res) {
                                 $expr: { $eq: ['$movieId', '$$movieId'] }
                             }
                         },
-                        { $sort: { createdAt: -1 } } // Sort reviews by createdAt field in descending order
+                        { $sort: { createdAt: -1 } }
                     ],
                     as: 'reviews'
                 }
