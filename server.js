@@ -142,6 +142,11 @@ router.get('/movies', function(req, res) {
                 }
             },
             {
+                $addFields: {
+                    avgRatingRounded: { $round: ['$avgRating', 1] } // Round average rating to 1 decimal place
+                }
+            },
+            {
                 $sort: { avgRating: -1 }
             }
         ]).exec(function(err, movies) {
@@ -190,6 +195,11 @@ router.get('/movies/:id', function(req, res) {
             {
                 $addFields: {
                   avgRating: { $avg: '$reviews.rating' }
+                }
+            },
+            {
+                $addFields: {
+                    avgRatingRounded: { $round: ['$avgRating', 1] } // Round average rating to 1 decimal place
                 }
             }
         ]).exec(function(err, movies) {
