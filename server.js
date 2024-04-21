@@ -138,7 +138,7 @@ router.get('/movies', function(req, res) {
             },
             {
                 $addFields: {
-                  avgRating: { $avg: '$movieReviews.rating' }
+                  avgRating: { $avg: '$reviews.rating' }
                 }
             },
             {
@@ -189,7 +189,7 @@ router.get('/movies/:id', function(req, res) {
             },
             {
                 $addFields: {
-                  avgRating: { $avg: '$movieReviews.rating' }
+                  avgRating: { $avg: '$reviews.rating' }
                 }
             }
         ]).exec(function(err, movies) {
