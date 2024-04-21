@@ -109,7 +109,7 @@ router.post('/movies', function(req, res) {
             releaseDate: req.body.releaseDate,
             genre: req.body.genre,
             actors: req.body.actors,
-            imageURL: req.body.imageUrl
+            imageUrl: req.body.imageUrl
         });
 
         newMovie.save(function(err) {
