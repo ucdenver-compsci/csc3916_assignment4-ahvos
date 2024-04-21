@@ -171,7 +171,7 @@ router.get('/movies/:id', function(req, res) {
 });
 
 
-/*
+
 router.get('/movies', function(req, res) {
     // Check if reviews=true query parameter is provided
     const includeReviews = req.query.reviews === 'true';
@@ -201,7 +201,6 @@ router.get('/movies', function(req, res) {
         });
     }
 });
-*/
 
 
 
@@ -239,7 +238,7 @@ router.post('/reviews', function(req, res) {
         if (err) {
             return res.status(500).json({ success: false, message: 'Failed to add the review.', error: err });
         }
-        res.status(201).json({ success: true, message: 'Review added successfully.' });
+        res.status(201).json({ success: true, message: 'Review created!.' });
     });
 });
 
