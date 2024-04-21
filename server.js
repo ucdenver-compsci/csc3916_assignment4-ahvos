@@ -91,7 +91,7 @@ router.post('/signin', function (req, res) {
 
 router.post('/movies', function(req, res) {
     // Check if all required fields are provided
-    if (!req.body.title || !req.body.releaseDate || !req.body.genre || !req.body.actors || !req.body.imageURL) {
+    if (!req.body.title || !req.body.releaseDate || !req.body.genre || !req.body.actors || !req.body.imageUrl) {
         return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
     }
 
