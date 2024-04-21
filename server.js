@@ -122,6 +122,37 @@ router.post('/movies', function(req, res) {
 });
 
 
+router.get('/movies', function(req, res) {
+    // Check if reviews=true query parameter is provided
+    const includeReviews = req.query.reviews === 'true';
+
+    if (includeReviews) {
+        Movie.aggregate([
+            {
+                $lookup: {
+                    from: 'reviews',
+                    localField: '_id',
+                    foreignField: 'movieId',
+                    as: 'reviews'
+                }
+            }
+        ]).exec(function(err, movies) {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Failed to retrieve movies with reviews.', error: err });
+            }
+            res.status(200).json({ success: true, movies: movies });
+        });
+    } else {
+        Movie.find({}, function(err, movies) {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Failed to retrieve movies.', error: err });
+            }
+            res.status(200).json({ success: true, movies: movies });
+        });
+    }
+});
+
+
 router.get('/movies/:id', function(req, res) {
     const movieId = req.params.id;
     const includeReviews = req.query.reviews === 'true';
@@ -169,40 +200,6 @@ router.get('/movies/:id', function(req, res) {
         });
     }
 });
-
-
-/*
-router.get('/movies', function(req, res) {
-    // Check if reviews=true query parameter is provided
-    const includeReviews = req.query.reviews === 'true';
-
-    if (includeReviews) {
-        Movie.aggregate([
-            {
-                $lookup: {
-                    from: 'reviews',
-                    localField: '_id',
-                    foreignField: 'movieId',
-                    as: 'reviews'
-                }
-            }
-        ]).exec(function(err, movies) {
-            if (err) {
-                return res.status(500).json({ success: false, message: 'Failed to retrieve movies with reviews.', error: err });
-            }
-            res.status(200).json({ success: true, movies: movies });
-        });
-    } else {
-        Movie.find({}, function(err, movies) {
-            if (err) {
-                return res.status(500).json({ success: false, message: 'Failed to retrieve movies.', error: err });
-            }
-            res.status(200).json({ success: true, movies: movies });
-        });
-    }
-});
-*/
-
 
 
 
