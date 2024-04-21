@@ -135,6 +135,14 @@ router.get('/movies', function(req, res) {
                     foreignField: 'movieId',
                     as: 'reviews'
                 }
+            },
+            {
+                $addFields: {
+                  avgRating: { $avg: '$movieReviews.rating' }
+                }
+            },
+            {
+                $sort: { avgRating: -1 }
             }
         ]).exec(function(err, movies) {
             if (err) {
