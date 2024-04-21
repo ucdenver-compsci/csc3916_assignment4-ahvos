@@ -94,7 +94,7 @@ describe('Test Review Routes', () => {
                         movie.should.have.property('releaseDate')
                         movie.should.have.property('genre')
                         movie.should.have.property('actors')
-                        movie.should.have.property('imageURL')
+                        movie.should.have.property('imageUrl')
                     });
                     done();
                 })
