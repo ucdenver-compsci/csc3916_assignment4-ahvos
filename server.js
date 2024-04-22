@@ -241,38 +241,39 @@ router.delete('/movies/:id', function(req, res) {
 
 
 router.post('/reviews', function(req, res) {
-    if (!req.body.movieId || !req.body.username || !req.body.review || !req.body.rating) {
-        return res.status(400).json({ success: false, message: 'Please provide all required fields.' });
-    }
-
     const { movieId, username, review, rating } = req.body;
-
-    // Check if the movie with the given movieId exists
-    Movie.findById(movieId, function(err, movie) {
+    Review.findOne({ movieId, username }, function(err, existingReview) {
         if (err) {
-            return res.status(500).json({ success: false, message: 'Failed to find the movie.', error: err });
-        }
-        if (!movie) {
-            return res.status(404).json({ success: false, message: 'Movie not found.' });
+            return res.status(500).json({ success: false, message: 'Failed to check for existing review.', error: err });
         }
 
-        // Movie exists, proceed to save the new review
-        var newReview = new Review({
-            movieId,
-            username,
-            review,
-            rating
-        });
+        if (existingReview) {
+            existingReview.review = review;
+            existingReview.rating = rating;
+            existingReview.save(function(err, updatedReview) {
+                if (err) {
+                    return res.status(500).json({ success: false, message: 'Failed to update the review.', error: err });
+                }
+                res.status(200).json({ success: true, message: 'Review updated successfully.', review: updatedReview });
+            });
+        } else {
+            var newReview = new Review({
+                movieId,
+                username,
+                review,
+                rating
+            });
 
-        newReview.save(function(err, savedReview) {
-            if (err) {
-                return res.status(500).json({ success: false, message: 'Failed to add the review.', error: err });
-            }
-            // Return the newly created review data in the response
-            res.status(201).json({ success: true, message: 'Review created!', review: savedReview });
-        });
+            newReview.save(function(err, savedReview) {
+                if (err) {
+                    return res.status(500).json({ success: false, message: 'Failed to add the review.', error: err });
+                }
+                res.status(201).json({ success: true, message: 'Review created!', review: savedReview });
+            });
+        }
     });
 });
+
 
 
 
