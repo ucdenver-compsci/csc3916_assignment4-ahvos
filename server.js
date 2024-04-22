@@ -247,20 +247,33 @@ router.post('/reviews', function(req, res) {
 
     const { movieId, username, review, rating } = req.body;
 
-    var newReview = new Review({
-        movieId,
-        username,
-        review,
-        rating
-    });
-
-    newReview.save(function(err) {
+    // Check if the movie with the given movieId exists
+    Movie.findById(movieId, function(err, movie) {
         if (err) {
-            return res.status(500).json({ success: false, message: 'Failed to add the review.', error: err });
+            return res.status(500).json({ success: false, message: 'Failed to find the movie.', error: err });
         }
-        res.status(201).json({ success: true, message: 'Review created!.' });
+        if (!movie) {
+            return res.status(404).json({ success: false, message: 'Movie not found.' });
+        }
+
+        // Movie exists, proceed to save the new review
+        var newReview = new Review({
+            movieId,
+            username,
+            review,
+            rating
+        });
+
+        newReview.save(function(err, savedReview) {
+            if (err) {
+                return res.status(500).json({ success: false, message: 'Failed to add the review.', error: err });
+            }
+            // Return the newly created review data in the response
+            res.status(201).json({ success: true, message: 'Review created!', review: savedReview });
+        });
     });
 });
+
 
 
 
